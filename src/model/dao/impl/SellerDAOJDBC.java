@@ -10,7 +10,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SellerDAOJDBC implements SellerDAO {
     private Connection conn;
@@ -89,9 +91,38 @@ public class SellerDAOJDBC implements SellerDAO {
         }
     }
 
+    //Essa implantação com Map poderia ser utilizada no findByDepartment para assegurar que o mesmo Department é usado
+    //em todos os Sellers E que os dados que Department é inicializado com são condizentes com os dados reais do banco.
     @Override
     public List<Seller> findAll() {
-        return List.of();
+        String sql = "SELECT seller.*,department.Name as DepName "
+                + "FROM seller INNER JOIN department "
+                + "ON seller.DepartmentId = department.Id "
+                + "ORDER BY Name ";
+
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = st.executeQuery()) {
+
+                List<Seller> list = new ArrayList<>();
+                Map<Integer, Department> map = new HashMap<>();
+
+                while (rs.next()) {
+                    Department dep = map.get(rs.getInt("DepartmentId"));
+
+                    if (dep == null){
+                        dep = instantiateDep(rs);
+                        map.put(rs.getInt("DepartmentId"), dep);
+                    }
+
+                    list.add(instantiateSeller(rs, dep));
+                }
+
+                return list;
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
     }
 
     public Department instantiateDep(ResultSet rs) throws SQLException {

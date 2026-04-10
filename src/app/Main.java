@@ -23,5 +23,13 @@ public class Main {
         for (Seller obj : seller){
             System.out.println(obj.toString());
         }
+
+        //FindAll
+        System.out.println("####################FINDALL####################");
+        List<Seller> allSellers = sellerDAO.findAll();
+
+        for (Seller obj : allSellers){
+            System.out.println(obj.toString());
+        }
     }
 }
