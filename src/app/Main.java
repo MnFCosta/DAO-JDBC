@@ -5,11 +5,12 @@ import model.dao.SellerDAO;
 import model.entities.Department;
 import model.entities.Seller;
 
+import java.util.Date;
 import java.util.List;
 
 public class Main {
     static void main() {
-
+  
         SellerDAO sellerDAO = DaoFactory.createSellerDao();
         Department dep = new Department(2, "Eletronics");
 
@@ -31,5 +32,13 @@ public class Main {
         for (Seller obj : allSellers){
             System.out.println(obj.toString());
         }
+
+        //CREATE
+        System.out.println("####################CREATE####################");
+        Seller newSeller = new Seller(null, "Walter", "walter@gmail.com", new Date(), 5000.0, dep);
+
+        sellerDAO.insert(newSeller);
+
+        System.out.println("New Seller registered, ID = " + newSeller.getId());
     }
 }
