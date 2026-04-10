@@ -9,12 +9,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SellerDAOJDBC implements SellerDAO {
     private Connection conn;
 
-    public SellerDAOJDBC(Connection conn){
+    public SellerDAOJDBC(Connection conn) {
         this.conn = conn;
     }
 
@@ -41,12 +42,12 @@ public class SellerDAOJDBC implements SellerDAO {
                 + "ON seller.DepartmentId = department.Id "
                 + "WHERE seller.Id = ? ";
 
-        try (PreparedStatement st = conn.prepareStatement(sql)){
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
 
             st.setInt(1, id);
 
-            try (ResultSet rs = st.executeQuery()){
-                if(rs.next()){
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
                     Department dep = instantiateDep(rs);
 
                     return instantiateSeller(rs, dep);
@@ -54,7 +55,36 @@ public class SellerDAOJDBC implements SellerDAO {
             }
             return null;
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+    }
+
+    //O problema dessa implementação é que os dados do objeto department passado não necessariamente condizem com os do banco de dados
+    //Apenas sua chave primária (Id) precisa estar correta, caso outros valores estejam diferentes, será criada uma lista com dados que não condizem
+    //com o banco de dados
+    public List<Seller> findByDepartment(Department dep) {
+
+        String sql = "SELECT seller.*,department.Name as DepName "
+                + "FROM seller INNER JOIN department "
+                + "ON seller.DepartmentId = department.Id "
+                + "WHERE DepartmentId = ? "
+                + "ORDER BY Name  ";
+
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+
+            st.setInt(1, dep.getId());
+
+            try (ResultSet rs = st.executeQuery()) {
+
+                List<Seller> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(instantiateSeller(rs, dep));
+                }
+
+                return list;
+            }
+        } catch (SQLException e) {
             throw new DbException(e.getMessage());
         }
     }
@@ -64,14 +94,14 @@ public class SellerDAOJDBC implements SellerDAO {
         return List.of();
     }
 
-    public Department instantiateDep(ResultSet rs) throws SQLException{
+    public Department instantiateDep(ResultSet rs) throws SQLException {
         Department dep = new Department();
         dep.setId(rs.getInt("DepartmentId"));
         dep.setName(rs.getString("DepName"));
         return dep;
     }
 
-    public Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException{
+    public Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
         Seller obj = new Seller();
         obj.setId(rs.getInt("Id"));
         obj.setName(rs.getString("Name"));
