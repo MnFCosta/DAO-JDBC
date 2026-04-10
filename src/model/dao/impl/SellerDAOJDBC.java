@@ -36,7 +36,7 @@ public class SellerDAOJDBC implements SellerDAO {
 
     @Override
     public Seller findById(Integer id) {
-        String sql = "SELECT seller.*,department.Name as DepName"
+        String sql = "SELECT seller.*,department.Name as DepName "
                 + "FROM seller INNER JOIN department "
                 + "ON seller.DepartmentId = department.Id "
                 + "WHERE seller.Id = ? ";
