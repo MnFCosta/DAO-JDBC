@@ -36,9 +36,17 @@ public class Main {
         //CREATE
         System.out.println("####################CREATE####################");
         Seller newSeller = new Seller(null, "Walter", "walter@gmail.com", new Date(), 5000.0, dep);
-
         sellerDAO.insert(newSeller);
 
         System.out.println("New Seller registered, ID = " + newSeller.getId());
+
+        //UPDATE
+        System.out.println("####################UPDATE####################");
+        Seller update = sellerDAO.findById(1);
+        update.setName("Pitoco");
+        sellerDAO.update(update);
+        System.out.println("Update complete");
+
+        //DELETE
     }
 }
