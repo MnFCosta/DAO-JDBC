@@ -77,7 +77,28 @@ public class SellerDAOJDBC implements SellerDAO {
 
     @Override
     public void deleteById(Integer id) {
+        String sql = """
+                    DELETE FROM seller
+                    WHERE Id = ?
+                    """;
 
+        try (PreparedStatement st = conn.prepareStatement(sql)){
+            conn.setAutoCommit(false);
+
+            st.setInt(1, id);
+
+            st.executeUpdate();
+
+            conn.commit();
+
+        }catch (SQLException e){
+            try {
+                conn.rollback();
+                throw new DbException("Transaction rolled back! Caused by: " + e.getMessage());
+            } catch (SQLException ex) {
+                throw new DbException("Database rollback failed, God save you, Caused by: " + ex.getMessage());
+            }
+        }
     }
 
     @Override

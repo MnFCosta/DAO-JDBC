@@ -48,5 +48,7 @@ public class Main {
         System.out.println("Update complete");
 
         //DELETE
+        System.out.println("####################DELETE####################");
+        sellerDAO.deleteById(20);
     }
 }
