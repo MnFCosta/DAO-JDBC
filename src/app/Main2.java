@@ -8,6 +8,10 @@ import java.util.List;
 
 public class Main2 {
     static void main() {
+        //Lembrar que nessa implementação a conexão com a DB nunca é fechada pelo programa, isso poderia causar problemas
+        //em um programa que estivesse em execução constante em um servidor (novas conexões seriam criadas toda hora sem ser fechadas),
+        // mas como está localmente e o programa termina de executar, a conexão é fechada automaticamente
+
         DepartmentDAO depDao = DaoFactory.createDepDao();
 
         System.out.println("####################FINDBYID####################");
